@@ -1,21 +1,35 @@
-const movieService = require('../services/movies.service');
+const { fetchAndSaveMovies, getMovies } = require('../services/movies.service');
+const Movie = require('../models/Movie');
 
-const fetchMovies = async (req, res) => {
+const fetchMoviesFromAPI = async (req, res) => {
   try {
-    const movies = await movieService.fetchAndSaveMovies();
-    res.status(200).json(movies);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    const movies = await fetchAndSaveMovies();
+    res.json(movies);
+  } catch (error) {
+    console.error('Error al obtener películas desde OMDb:', error.message);
+    res.status(500).json({ error: 'No se pudieron obtener las películas.' });
   }
 };
 
-const getMovies = async (req, res) => {
+const fetchMoviesFromDatabase = async (req, res) => {
   try {
-    const movies = await movieService.getMovies(req.query);
-    res.status(200).json(movies);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    const filters = req.query; // Obtener filtros de los parámetros de la URL
+    const movies = await getMovies(filters); // Pasar filtros al servicio
+    res.json(movies);
+  } catch (error) {
+    console.error('Error al obtener películas desde la base de datos:', error.message);
+    res.status(500).json({ error: 'No se pudieron obtener las películas.' });
   }
 };
 
-module.exports = { fetchMovies, getMovies };
+const getAllMovies = async (req, res) => {
+  try {
+    const movies = await Movie.findAll(); // Obtiene todos los registros de la tabla Movies
+    res.json(movies); // Devuelve los datos en formato JSON
+  } catch (error) {
+    console.error('Error al obtener películas:', error.message);
+    res.status(500).json({ error: 'Error al obtener películas de la base de datos.' });
+  }
+};
+
+module.exports = { fetchMoviesFromAPI, fetchMoviesFromDatabase, getAllMovies};

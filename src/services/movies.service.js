@@ -6,7 +6,6 @@ const fetchAndSaveMovies = async () => {
   try {
     // Construir la URL usando las variables del .env
     const apiUrl = `${process.env.OMDB_API_URL}/?s=harry+potter&apikey=${process.env.OMDB_API_KEY}`;
-
     // Realizar la solicitud a la API de OMDb
     const response = await axios.get(apiUrl);
 
@@ -37,12 +36,15 @@ const getMovies = async (filters) => {
   if (filters.year) {
     where.year = filters.year;
   }
-  if (filters.rating) {
-    where.personalRating = filters.rating;
+  if (filters.personalRating) {
+    console.log("Filtro recibido (personalRating):", filters.personalRating);
+    where.personalRating = Number(filters.personalRating);
   }
 
   const movies = await Movie.findAll({ where });
   return movies;
 };
+
+
 
 module.exports = { fetchAndSaveMovies, getMovies };
